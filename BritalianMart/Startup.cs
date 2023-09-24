@@ -28,6 +28,6 @@ namespace BritalianMart
             builder.Services.AddSingleton(cosmoClient);
 
             //Inject validator
-            builder.Services.AddScoped<IProductValidator, Validator>();
+            builder.Services.AddScoped<IProductValidator, ProductValidator>();
         }
     } }

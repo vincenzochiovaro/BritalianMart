@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace BritalianMart.Services
 {
-    public class Validator : IProductValidator
+    public class ProductValidator : IProductValidator
     {
         public  bool IsValid(ProductModel product)
         {
