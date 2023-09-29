@@ -17,7 +17,9 @@ namespace BritalianMartTests.ServicesTest
             {
                 Plu = "validPlu",
                 Description = "ValidDescription",
-                Price = "10.00"
+                Price = 5,
+                Category = "ValidCategory",
+                Brand = "ValidBrand"
             };
 
             // Act
@@ -36,7 +38,9 @@ namespace BritalianMartTests.ServicesTest
             {
                 Plu = "validPlu",
                 Description = "Shrt",
-                Price = "10.00"
+                Price = 5,
+                Category = "ValidCategory",
+                Brand = "ValidBrand"
             };
 
             // Act
@@ -46,8 +50,9 @@ namespace BritalianMartTests.ServicesTest
             result.Should().BeFalse();
         }
 
+      
         [Fact]
-        public void IsValid_PriceNotParseable_ReturnsFalse()
+        public void IsValid_PriceIsNegativeNumber_ReturnsFalse()
         {
             // Arrange
             var validator = new ProductValidator();
@@ -55,26 +60,7 @@ namespace BritalianMartTests.ServicesTest
             {
                 Plu = "validPlu",
                 Description = "ValidDescription",
-                Price = "NotAPrice" 
-            };
-
-            // Act
-            bool result = validator.IsValid(product);
-
-            // Assert
-            result.Should().BeFalse();
-        }
-
-        [Fact]
-        public void IsValid_PriceLessThanOrEqualToZero_ReturnsFalse()
-        {
-            // Arrange
-            var validator = new ProductValidator();
-            var product = new ProductModel
-            {
-                Plu = "validPlu",
-                Description = "ValidDescription",
-                Price = "0.00" 
+                Price = -1 
             };
 
             // Act
@@ -93,7 +79,9 @@ namespace BritalianMartTests.ServicesTest
             {
                 Plu = "", 
                 Description = "ValidDescription",
-                Price = "10.00"
+                Price = 5,
+                Category = "ValidCategory",
+                Brand = "ValidBrand"
             };
 
             // Act

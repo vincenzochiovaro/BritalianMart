@@ -1,46 +1,38 @@
-using System;
-using System.IO;
-using System.Threading.Tasks;
+using BritalianMart.Interfaces;
+using BritalianMart.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.Azure.WebJobs.Description;
-using Microsoft.Azure.Cosmos;
-using Microsoft.Azure.Cosmos.Serialization.HybridRow.Schemas;
-using BritalianMart.Models;
-using Azure;
-using BritalianMart.Interfaces;
-using System.ComponentModel.DataAnnotations;
+using MongoDB.Driver;
+using System;
+using System.Threading.Tasks;
+using System.Web.Http;
 
 namespace BritalianMart.Functions
 {
-    
+
 
 
     public  class InsertProduct
     {
-        private readonly CosmosClient _cosmosClient;
-        private readonly Database _cosmosDB;
+       
         private readonly IProductValidator _validator;
+        private readonly IProductCatalog _catalog;
 
+        public InsertProduct(IProductCatalog catalog, IProductValidator validator ) {
 
-        public InsertProduct(CosmosClient cosmosClient, IProductValidator validator ) {
-
-            _cosmosClient = cosmosClient ?? throw new ArgumentException(nameof(cosmosClient));
-            _cosmosDB = _cosmosClient.GetDatabase("ToDoList");
-            _validator = validator;
+           _catalog = catalog;
+           _validator = validator;
 
         }
 
-      
+
 
         [FunctionName("InsertProduct")]
-        public  async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] ProductModel product, ILogger log)
+        public async Task<IActionResult> Run(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "product")] ProductModel product, ILogger log)
          {
            
             try
@@ -52,15 +44,19 @@ namespace BritalianMart.Functions
                     product.Created = DateTime.UtcNow;
                     product.Modified = DateTime.UtcNow;
 
-                    var dbContainer = _cosmosDB.GetContainer("ProductCatalog");
-                    var response = await dbContainer.CreateItemAsync(product);
-                    log.LogInformation($"Product Inserted into cosmoDB successfully");
-                    return new CreatedResult(product.Id, product);
+
+
+                    await _catalog.Add(product);
+
+                    log.LogInformation($"Product Inserted into DB successfully");
+                    return new CreatedResult(product.Id,product);
+                   
+                    
 
                 }else
                 {
-                    log.LogInformation("Product Not validated");
-                    throw new Exception("Product validation failed.");
+                    log.LogInformation("Product Not validated in InsertProductCosmos");
+                    return new BadRequestObjectResult(product); 
                 }
                
             }
@@ -76,5 +72,6 @@ namespace BritalianMart.Functions
             }
 
         }
+
     }
 }

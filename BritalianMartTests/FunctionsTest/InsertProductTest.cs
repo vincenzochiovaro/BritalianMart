@@ -13,278 +13,105 @@ using Moq;
 using Microsoft.Extensions.Logging;
 using System.ComponentModel.DataAnnotations;
 using BritalianMart.Services;
+using MongoDB.Driver;
+using AutoFixture;
 
 namespace BritalianMartTests.FunctionsTest
 {
     public class InsertProductTest
     {
+        private readonly Fixture _fixture;
+        private readonly Mock<IProductCatalog> _mockCatalog;
+        private readonly Mock<ILogger> _mockLogger;
+        private readonly ProductValidator _validator;
+
+        public InsertProductTest()
+        {
+            _fixture = new Fixture();
+            _mockCatalog = new Mock<IProductCatalog>();
+            _mockLogger = new Mock<ILogger>();
+            _validator = new ProductValidator();
+
+
+        }
+
         [Fact]
         public async Task InsertProduct_ValidProduct_returnsCreatedResult()
         {
-            //Arrange
-            var loggerMock = new Mock<ILogger>();
-            var cosmosClientMock = new Mock<CosmosClient>();
+            // Arrange
+            var product = _fixture.Create<ProductModel>();
 
-            //Mock all the steps of cosmosdb
-            cosmosClientMock.Setup(service => service.GetDatabase("ToDoList")).Returns(() =>
-            {
-                var databaseMock = new Mock<Database>();
-                databaseMock.Setup(service => service.GetContainer("ProductCatalog"))
-                .Returns(() =>
-                {
-                    var containerMock = new Mock<Container>();
-                    var cosmosResponseMock = new Mock<ItemResponse<ProductModel>>();
-                    //setup containerMock
-                    containerMock.Setup(service => service.CreateItemAsync(It.IsAny<ProductModel>(), null, null, default)).ReturnsAsync(cosmosResponseMock.Object);
-                    return containerMock.Object;
-                });
-                return databaseMock.Object;
-               
-            });
+            _mockCatalog.Setup(x => x.Add(product)).Returns(Task.CompletedTask);
 
-            var product = new ProductModel
-            {
-                Plu = "validPlu",
-                Description = "ValidDescription",
-                Price = "0.01"
-            };
+            var sut = new InsertProduct(_mockCatalog.Object, _validator);
 
+            // Act
+            var result = await sut.Run(product, _mockLogger.Object);
 
-            //Should I mock the validator?
-            var validator = new ProductValidator();
-            var sut = new InsertProduct(cosmosClientMock.Object, validator);
-
-            //Act
-            var result = await sut.Run(product, loggerMock.Object);
-
-            //Assert
+            // Assert
+            _mockCatalog.Verify(x => x.Add(product), Times.Exactly(1));
             result.Should().BeOfType<CreatedResult>();
         }
+
         [Fact]
         public async Task InsertProduct_InValidProduct_WithPluNotValid_returnsBadRequest()
         {
-            //Arrange
-            var loggerMock = new Mock<ILogger>();
-            var cosmosClientMock = new Mock<CosmosClient>();
+            // Arrange
+            var product = _fixture.Create<ProductModel>();
+            product.Plu = "";
 
-            //Mock all the steps of cosmosdb
-            cosmosClientMock.Setup(service => service.GetDatabase("ToDoList")).Returns(() =>
-            {
-                var databaseMock = new Mock<Database>();
-                databaseMock.Setup(service => service.GetContainer("ProductCatalog"))
-                .Returns(() =>
-                {
-                    var containerMock = new Mock<Container>();
-                    var cosmosResponseMock = new Mock<ItemResponse<ProductModel>>();
-                    //setup containerMock
-                    containerMock.Setup(service => service.CreateItemAsync(It.IsAny<ProductModel>(), null, null, default)).ReturnsAsync(cosmosResponseMock.Object);
-                    return containerMock.Object;
-                });
-                return databaseMock.Object;
+            _mockCatalog.Setup(x => x.Add(product)).Returns(Task.CompletedTask);
 
-            });
+            var sut = new InsertProduct(_mockCatalog.Object, _validator);
 
-            var product = new ProductModel
-            {
-                Plu = "",
-                Description = "ValidDescription",
-                Price = "0.01"
-            };
+            // Act
+            var result = await sut.Run(product, _mockLogger.Object);
 
-            //Should I mock the validator?
-            var validator = new ProductValidator();
-            
-
-            var sut = new InsertProduct(cosmosClientMock.Object, validator);
-
-           
-
-            //Act
-            var result = await sut.Run(product, loggerMock.Object);
-
-            //Assert
+            // Assert
+            _mockCatalog.Verify(x => x.Add(product), Times.Exactly(0));
             result.Should().BeOfType<BadRequestObjectResult>();
         }
+
         [Fact]
-        public async Task InsertProduct_InValidProduct_WithDescriptionNotVali_WhenDescriptionLengthisLessThan5_returnsBadRequest()
+        public async Task InsertProduct_InValidProduct_WithDescriptionNotValid_WhenDescriptionLengthisLessThan5_returnsBadRequest()
         {
-            //Arrange
-            var loggerMock = new Mock<ILogger>();
-            var cosmosClientMock = new Mock<CosmosClient>();
+            // Arrange
 
-            //Mock all the steps of cosmosdb
-            cosmosClientMock.Setup(service => service.GetDatabase("ToDoList")).Returns(() =>
-            {
-                var databaseMock = new Mock<Database>();
-                databaseMock.Setup(service => service.GetContainer("ProductCatalog"))
-                .Returns(() =>
-                {
-                    var containerMock = new Mock<Container>();
-                    var cosmosResponseMock = new Mock<ItemResponse<ProductModel>>();
-                    //setup containerMock
-                    containerMock.Setup(service => service.CreateItemAsync(It.IsAny<ProductModel>(), null, null, default)).ReturnsAsync(cosmosResponseMock.Object);
-                    return containerMock.Object;
-                });
-                return databaseMock.Object;
+            var product = _fixture.Create<ProductModel>();
+            product.Description = "123";
 
-            });
+            _mockCatalog.Setup(x => x.Add(product)).Returns(Task.CompletedTask);
 
-            var product = new ProductModel
-            {
-                Plu = "validPlu",
-                Description = "1234",
-                Price = "0.01"
-            };
+            var sut = new InsertProduct(_mockCatalog.Object, _validator);
 
-            //Should I mock the validator?
-            var validator = new ProductValidator();
+            // Act
+            var result = await sut.Run(product, _mockLogger.Object);
 
-
-            var sut = new InsertProduct(cosmosClientMock.Object, validator);
-
-
-
-            //Act
-            var result = await sut.Run(product, loggerMock.Object);
-
-            //Assert
+            // Assert
+            _mockCatalog.Verify(x => x.Add(product), Times.Exactly(0));
             result.Should().BeOfType<BadRequestObjectResult>();
         }
+
         [Fact]
-        public async Task InsertProduct_InValidProduct_WhenPriceIsLessThan001_returnsBadRequest()
+        public async Task InsertProduct_InValidProduct_WhenPriceIsNegative_returnsBadRequest()
         {
-            //Arrange
-            var loggerMock = new Mock<ILogger>();
-            var cosmosClientMock = new Mock<CosmosClient>();
+            // Arrange
+            var product = _fixture.Create<ProductModel>();
+            product.Price = -1;
 
-            //Mock all the steps of cosmosdb
-            cosmosClientMock.Setup(service => service.GetDatabase("ToDoList")).Returns(() =>
-            {
-                var databaseMock = new Mock<Database>();
-                databaseMock.Setup(service => service.GetContainer("ProductCatalog"))
-                .Returns(() =>
-                {
-                    var containerMock = new Mock<Container>();
-                    var cosmosResponseMock = new Mock<ItemResponse<ProductModel>>();
-                    //setup containerMock
-                    containerMock.Setup(service => service.CreateItemAsync(It.IsAny<ProductModel>(), null, null, default)).ReturnsAsync(cosmosResponseMock.Object);
-                    return containerMock.Object;
-                });
-                return databaseMock.Object;
+            _mockCatalog.Setup(x => x.Add(product)).Returns(Task.CompletedTask);
 
-            });
+            var sut = new InsertProduct(_mockCatalog.Object, _validator);
+            // Act
+            var result = await sut.Run(product, _mockLogger.Object);
 
-            var product = new ProductModel
-            {
-                Plu = "validPlu",
-                Description = "validDescription",
-                Price = "0.00"
-            };
-
-            //Should I mock the validator?
-            var validator = new ProductValidator();
-
-
-            var sut = new InsertProduct(cosmosClientMock.Object, validator);
-
-
-
-            //Act
-            var result = await sut.Run(product, loggerMock.Object);
-
-            //Assert
+            // Assert
+            _mockCatalog.Verify(x => x.Add(product), Times.Exactly(0));
             result.Should().BeOfType<BadRequestObjectResult>();
         }
-        [Fact]
-        public async Task InsertProduct_InValidProduct_WhenPriceIsStringDifferentThanFree_returnsBadRequest()
-        {
-            //Arrange
-            var loggerMock = new Mock<ILogger>();
-            var cosmosClientMock = new Mock<CosmosClient>();
-
-            //Mock all the steps of cosmosdb
-            cosmosClientMock.Setup(service => service.GetDatabase("ToDoList")).Returns(() =>
-            {
-                var databaseMock = new Mock<Database>();
-                databaseMock.Setup(service => service.GetContainer("ProductCatalog"))
-                .Returns(() =>
-                {
-                    var containerMock = new Mock<Container>();
-                    var cosmosResponseMock = new Mock<ItemResponse<ProductModel>>();
-                    //setup containerMock
-                    containerMock.Setup(service => service.CreateItemAsync(It.IsAny<ProductModel>(), null, null, default)).ReturnsAsync(cosmosResponseMock.Object);
-                    return containerMock.Object;
-                });
-                return databaseMock.Object;
-
-            });
-
-            var product = new ProductModel
-            {
-                Plu = "validPlu",
-                Description = "validDescription",
-                Price = "can Be Free or Number"
-            };
-
-            //Should I mock the validator?
-            var validator = new ProductValidator();
-
-
-            var sut = new InsertProduct(cosmosClientMock.Object, validator);
 
 
 
-            //Act
-            var result = await sut.Run(product, loggerMock.Object);
-
-            //Assert
-            result.Should().BeOfType<BadRequestObjectResult>();
-        }
-        [Fact]
-        public async Task InsertProduct_ValidProduct_WhenPriceIsSetToFree_returnsCreatedResult()
-        {
-            //Arrange
-            var loggerMock = new Mock<ILogger>();
-            var cosmosClientMock = new Mock<CosmosClient>();
-
-            //Mock all the steps of cosmosdb
-            cosmosClientMock.Setup(service => service.GetDatabase("ToDoList")).Returns(() =>
-            {
-                var databaseMock = new Mock<Database>();
-                databaseMock.Setup(service => service.GetContainer("ProductCatalog"))
-                .Returns(() =>
-                {
-                    var containerMock = new Mock<Container>();
-                    var cosmosResponseMock = new Mock<ItemResponse<ProductModel>>();
-                    //setup containerMock
-                    containerMock.Setup(service => service.CreateItemAsync(It.IsAny<ProductModel>(), null, null, default)).ReturnsAsync(cosmosResponseMock.Object);
-                    return containerMock.Object;
-                });
-                return databaseMock.Object;
-
-            });
-
-            var product = new ProductModel
-            {
-                Plu = "validPlu",
-                Description = "validDescription",
-                Price = "free"
-            };
-
-            //Should I mock the validator?
-            var validator = new ProductValidator();
-
-
-            var sut = new InsertProduct(cosmosClientMock.Object, validator);
-
-
-
-            //Act
-            var result = await sut.Run(product, loggerMock.Object);
-
-            //Assert
-            result.Should().BeOfType<CreatedResult>();
-        }
 
     }
 }
