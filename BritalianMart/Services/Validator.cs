@@ -1,53 +1,22 @@
-﻿using BritalianMart.Interfaces;
-using BritalianMart.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using BritalianMart.Models;
+using FluentValidation;
 
 namespace BritalianMart.Services
 {
-    public class ProductValidator : IProductValidator
+
+    public class ProductValidator : AbstractValidator<ProductModel>
     {
-        public  bool IsValid(ProductModel product)
-        {
+        public ProductValidator() {
 
-            //Note: This validation is not testing the data types, we are assuming that product.price is a number, that description is a string etc.
+            RuleFor(x => x.Description).MinimumLength(5);
+            RuleFor(x => x.Price).GreaterThanOrEqualTo(0);
+            RuleFor(x => x.Plu).MinimumLength(5).NotNull();
+            RuleFor(x => x.Category).MinimumLength(3).NotNull();
+            RuleFor(x => x.Brand).MinimumLength(3);
 
-            //validation 1: product.description can't be less than 5 chars 
-            if (product.Description.Length < 5 )
-            {
-                return false;
-            }
-
-            // Validation 2: productPrice must be > 0 
-            if (product.Price <= 0)
-            {
-                return false;
-            }
-
-            //validation 3: Plu can't be empty
-            if (product.Plu.Length <= 0 )
-            {
-                return false;
-            }
-
-            //validation 4: Category can't be empty
-            if (product.Category.Length <= 0 )
-            {
-                return false;
-            }
-
-            //Validation 5: Brand Can't be empty
-
-            if(product.Brand.Length <= 0)
-            {
-                return false;
-            }
-
-            return true;
         }
 
+
     }
+   
 }

@@ -1,20 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using AutoFixture;
+using BritalianMart.Catalog.Interfaces;
 using BritalianMart.Functions;
-using BritalianMart.Interfaces;
 using BritalianMart.Models;
+using BritalianMart.Services;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Cosmos;
-using Moq;
 using Microsoft.Extensions.Logging;
-using System.ComponentModel.DataAnnotations;
-using BritalianMart.Services;
-using MongoDB.Driver;
-using AutoFixture;
+using Moq;
 
 namespace BritalianMartTests.FunctionsTest
 {

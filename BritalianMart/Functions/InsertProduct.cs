@@ -1,27 +1,26 @@
-using BritalianMart.Interfaces;
+using BritalianMart.Catalog.Interfaces;
 using BritalianMart.Models;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
-using MongoDB.Driver;
 using System;
 using System.Threading.Tasks;
-using System.Web.Http;
 
 namespace BritalianMart.Functions
 {
 
 
 
-    public  class InsertProduct
+    public  class InsertProduct 
     {
        
-        private readonly IProductValidator _validator;
+        private readonly AbstractValidator<ProductModel> _validator;
         private readonly IProductCatalog _catalog;
 
-        public InsertProduct(IProductCatalog catalog, IProductValidator validator ) {
+        public InsertProduct(IProductCatalog catalog, AbstractValidator<ProductModel> validator ) {
 
            _catalog = catalog;
            _validator = validator;
@@ -38,13 +37,22 @@ namespace BritalianMart.Functions
             try
             {
 
-                if(_validator.IsValid(product) == true) {
+                var validatedProduct = _validator.Validate(product);
+
+                if(_validator.Validate(product).IsValid) {
 
                     product.Id = Guid.NewGuid().ToString();
                     product.Created = DateTime.UtcNow;
                     product.Modified = DateTime.UtcNow;
 
-
+                    // referencing to Andy video, we should make an extra check to prevent "duplicates"
+                    // BUTTT what if I want to insert 2 pints of milk with same plu and price and description?
+                    // if I referencethe Id (Guid) it will always be a "different" item so will be inserted regard if is a duplicated or an item to add.
+                  
+                   
+                    //Solution is: If We have a "duplicate" Item, we send back a message to the user says: Hey we have already 1 pint of milk are you sure you want to have a duplicate?
+                    
+                    
 
                     await _catalog.Add(product);
 
@@ -55,6 +63,7 @@ namespace BritalianMart.Functions
 
                 }else
                 {
+                    log.LogWarning(validatedProduct.ToString());
                     log.LogInformation("Product Not validated in InsertProductCosmos");
                     return new BadRequestObjectResult(product); 
                 }

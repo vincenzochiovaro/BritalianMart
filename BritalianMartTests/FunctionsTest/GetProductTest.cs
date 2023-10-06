@@ -1,11 +1,12 @@
 ﻿
+using AutoFixture;
+using BritalianMart.Catalog.Interfaces;
 using BritalianMart.Functions;
-using BritalianMart.Interfaces;
 using BritalianMart.Models;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
-using AutoFixture;
+
 namespace BritalianMartTests.FunctionsTest
 {
     public class GetProductTest
@@ -20,7 +21,7 @@ namespace BritalianMartTests.FunctionsTest
         }
 
         [Fact]
-        public async Task GetProduct_Success_ReturnOkObjectResult_Cosmos()
+        public async Task GetProduct_Success_ReturnOkObjectResult()
         {
             // Arrange
             var productModels = _fixture.CreateMany<ProductModel>(2).ToList();
@@ -29,7 +30,7 @@ namespace BritalianMartTests.FunctionsTest
             var sut = new GetProduct(_mockCatalogDatabase.Object);
 
             // Act
-            var result = await sut.GetAllProductsCosmos(null,null);
+            var result = await sut.GetAllProducts(null,null);
 
             // Assert
 
@@ -38,7 +39,7 @@ namespace BritalianMartTests.FunctionsTest
         }
 
         [Fact]
-        public async Task GetProduct_Exception_ReturnsBadRequestObjectResult_Cosmos()
+        public async Task GetProduct_Exception_ReturnsBadRequestObjectResult()
         {
             // Arrange
             _mockCatalogDatabase.Setup(x => x.GetAll()).ThrowsAsync(new Exception("Some error message"));
@@ -46,7 +47,7 @@ namespace BritalianMartTests.FunctionsTest
             var sut = new GetProduct(_mockCatalogDatabase.Object);
 
             // Act
-            var result = await sut.GetAllProductsCosmos(null, null);
+            var result = await sut.GetAllProducts(null, null);
 
             // Assert
             _mockCatalogDatabase.Verify(x => x.GetAll(), Times.Once());

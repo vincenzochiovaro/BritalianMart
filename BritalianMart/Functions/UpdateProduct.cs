@@ -1,54 +1,60 @@
-//using System;
-//using System.IO;
-//using System.Threading.Tasks;
-//using Microsoft.AspNetCore.Mvc;
-//using Microsoft.Azure.WebJobs;
-//using Microsoft.Azure.WebJobs.Extensions.Http;
-//using Microsoft.AspNetCore.Http;
-//using Microsoft.Extensions.Logging;
-//using Newtonsoft.Json;
-//using Microsoft.Azure.Cosmos;
-//using MongoDB.Driver;
-//using BritalianMart.Interfaces;
-//using BritalianMart.Models;
-//using Microsoft.Azure.Cosmos.Serialization.HybridRow.Schemas;
+using BritalianMart.Catalog.Interfaces;
+using BritalianMart.Models;
+using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Threading.Tasks;
 
-//namespace BritalianMart.Functions
-//{
-//    public  class UpdateProduct
-//    {
-//        private readonly CosmosClient _cosmosClient;
-//        private readonly MongoClient _mongoClient;
-//        private readonly IProductValidator _productValidator;
-
-//        public UpdateProduct(CosmosClient cosmosClient, MongoClient mongoClient, IProductValidator productValidator) {
-//            _cosmosClient = cosmosClient;
-//            _mongoClient = mongoClient;
-//            _productValidator = productValidator;
-//            //think about validator, what if we update description to be empty? 
-//        }
+namespace BritalianMart.Functions
+{
+    public class UpdateProduct
+    {
+        private readonly AbstractValidator<ProductModel> _productValidator;
+        private readonly IProductCatalog _catalog;
 
 
-//        [FunctionName("UpdateCosmosProduc")]
-//        public  async Task<IActionResult> Run(
-//            [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "cosmos/product/{id}")] HttpRequest req,
-//            ILogger log, string id)
-//        {
+        public UpdateProduct(AbstractValidator<ProductModel> productValidator, IProductCatalog catalog)
+        {
+            _productValidator = productValidator;
+            _catalog = catalog;
 
-//            var cosmosDB = _cosmosClient.GetDatabase("BritalianMartDB");
-//            var cosmosContainer = cosmosDB.GetContainer("ProductCatalog");
-            
+        }
 
 
-//            // I need to connect with cosmos and grab the document that match that id
-//            // then I want to modify the specific field i am passing with postman
+        [FunctionName("UpdateDescriptionProduct")]
+        public async Task<IActionResult> Run(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "product/{id}")] ProductModel IncomingProduct,
+            ILogger log, string id)
+        {
 
-//            //example i have a product with id,description, price
-//            // i send on postman that i want the description to be "hello world"
+            try
+            {
+                var existingProduct = await _catalog.GetById(id);
+
+                existingProduct.Description = IncomingProduct.Description;
+
+                if (_productValidator.Validate(existingProduct).IsValid)
+                {
+                    existingProduct.Modified = DateTime.UtcNow;
+
+                    await _catalog.Update(existingProduct);
+                    return new OkObjectResult(existingProduct);
+
+                }
+                else
+                {
+                    return new BadRequestObjectResult("Product can't be validated");
+                }
+            }
+            catch(Exception ex)
+            {
+                return new BadRequestObjectResult(ex);
+            }
 
 
-//            return new OkObjectResult("hi");
-
-//        }
-//    }
-//}
+        }
+    }
+}

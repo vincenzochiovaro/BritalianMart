@@ -1,6 +1,8 @@
 ﻿using BritalianMart;
-using BritalianMart.Interfaces;
+using BritalianMart.Catalog.Interfaces;
+using BritalianMart.Models;
 using BritalianMart.Services;
+using FluentValidation;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,8 +32,8 @@ namespace BritalianMart
             builder.Services.AddSingleton(cosmoClient);
             builder.Services.AddSingleton(mongoClient);
 
-            //Inject validator
-            builder.Services.AddScoped<IProductValidator, ProductValidator>();
-            builder.Services.AddScoped<IProductCatalog, CosmosDatabase>();
+            ////Inject validator
+            builder.Services.AddScoped<AbstractValidator<ProductModel>, ProductValidator>();
+            builder.Services.AddScoped<IProductCatalog, MongoDatabase>();
         }
     } }

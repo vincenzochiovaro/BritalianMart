@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BritalianMart", "BritalianM
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BritalianMartTests", "..\BritalianMartTests\BritalianMartTests.csproj", "{7053A7C7-C279-4911-A09E-01A4167BF4C8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BritalianMart.Catalog", "..\BritalianMart.Catalog\BritalianMart.Catalog.csproj", "{CA42DDC3-C134-470B-88C9-2BDE4F61FD54}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{7053A7C7-C279-4911-A09E-01A4167BF4C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7053A7C7-C279-4911-A09E-01A4167BF4C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7053A7C7-C279-4911-A09E-01A4167BF4C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA42DDC3-C134-470B-88C9-2BDE4F61FD54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA42DDC3-C134-470B-88C9-2BDE4F61FD54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA42DDC3-C134-470B-88C9-2BDE4F61FD54}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA42DDC3-C134-470B-88C9-2BDE4F61FD54}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
