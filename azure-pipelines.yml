@@ -1,0 +1,64 @@
+variables:
+  - group: integration-common
+
+trigger:
+  - main
+
+pool:
+  name: Azure Pipelines
+  vmImage: windows-2022
+
+stages:
+  - stage: Build_and_Test
+    displayName: Build, Test and Package
+    jobs:
+      - job: Build
+        displayName: Build .NET Project
+        steps:
+          - task: DotNetCoreCLI@2
+            displayName: "dotnet build"
+            inputs:
+              projects: "**/*.sln"
+              arguments: "--configuration $(build_configuration)"
+          - task: DotNetCoreCLI@2
+            displayName: "dotnet test"
+            inputs:
+              command: test
+              projects: "**/*Test*.csproj"
+              arguments: '--configuration $(build_configuration) --collect "Code coverage" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(Build.SourcesDirectory)/TestResults/Coverage/ --no-restore --no-build'
+          - task: DotNetCoreCLI@2
+            displayName: "dotnet publish"
+            inputs:
+              command: publish
+              publishWebProjects: false
+              projects: |
+                **/*BritalianMart.csproj
+              arguments: "--configuration $(build_configuration) --output $(build.artifactstagingdirectory)"
+              zipAfterPublish: true
+          - task: PublishPipelineArtifact@1
+            displayName: Publish code artifact
+            inputs:
+              artifact: drop
+              parallel: true
+              targetPath: "$(Build.ArtifactStagingDirectory)"
+              publishLocation: pipeline
+
+  - stage: Dev_Deploy
+    displayName: "Deploy to Dev"
+    dependsOn: Build_and_Test
+    jobs:
+      - job: Deploy
+        displayName: "Deploy to Dev"
+        steps:
+          - task: DownloadPipelineArtifact@2
+            inputs:
+              buildType: current
+              itemPattern: '**'
+              targetPath: '$(Pipeline.Workspace)'
+          - task: AzureFunctionApp@1
+            displayName: "Azure Function App Deploy: BritalianMart"
+            inputs:
+              azureSubscription: "$(subscription_dev)"
+              appType: functionApp
+              appName: "britalian-function-app-dev"
+              package: "$(Pipeline.Workspace)/drop/BritalianMart.zip"

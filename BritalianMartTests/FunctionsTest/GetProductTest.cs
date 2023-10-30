@@ -33,7 +33,6 @@ namespace BritalianMartTests.FunctionsTest
             var result = await sut.GetAllProducts(null,null);
 
             // Assert
-
             _mockCatalogDatabase.Verify(x => x.GetAll(), Times.Once());
             result.Should().BeOfType<OkObjectResult>();
         }

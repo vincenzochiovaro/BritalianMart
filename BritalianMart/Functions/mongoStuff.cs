@@ -29,7 +29,6 @@ namespace BritalianMart.Functions
                 var database = _mongoClient.GetDatabase("BritalianMartDB");
                 var collection = database.GetCollection<ProductModel>("ProductCatalog");
 
-                // Get Items By Brand ("Barilla" in this case)
                 var filter = Builders<ProductModel>.Filter.Eq("Brand", $"{brand}");
                 var products = await collection.Find(filter).ToListAsync();
               

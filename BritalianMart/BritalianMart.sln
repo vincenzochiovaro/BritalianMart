@@ -7,7 +7,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BritalianMart", "BritalianM
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BritalianMartTests", "..\BritalianMartTests\BritalianMartTests.csproj", "{7053A7C7-C279-4911-A09E-01A4167BF4C8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BritalianMart.Catalog", "..\BritalianMart.Catalog\BritalianMart.Catalog.csproj", "{CA42DDC3-C134-470B-88C9-2BDE4F61FD54}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BritalianMart.Catalog", "..\BritalianMart.Catalog\BritalianMart.Catalog.csproj", "{CA42DDC3-C134-470B-88C9-2BDE4F61FD54}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{62119ABB-1E06-4931-B7B7-9123E5539422}"
+	ProjectSection(SolutionItems) = preProject
+		..\azure-pipelines.yml = ..\azure-pipelines.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
