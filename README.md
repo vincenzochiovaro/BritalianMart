@@ -10,11 +10,7 @@ It offers a flexible and organized architecture.
 - .NET
 - C#
 - xUnit
-- Fluent Assertion
-- Fluent Validation
-- Postman
-- Fixture 
-- Moq 
+- CosmosDB 
 
 ## Project Structure
 
