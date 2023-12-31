@@ -2,7 +2,6 @@
 
 namespace BritalianMart.Catalog.Interfaces
 {
-    // ORM - EntityFramework, nHibernate
     public interface IProductCatalog
     {
         Task Add(ProductModel productModel);

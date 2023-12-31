@@ -62,3 +62,23 @@ stages:
               appType: functionApp
               appName: "britalian-function-app-dev"
               package: "$(Pipeline.Workspace)/drop/BritalianMart.zip"
+
+  - stage: Prod_Deploy
+    displayName: "Deploy to Prod/Uat"
+    dependsOn: Build_and_Test
+    jobs:
+      - job: Deploy
+        displayName: "Deploy to Prod/Uat"
+        steps:
+          - task: DownloadPipelineArtifact@2
+            inputs:
+              buildType: current
+              itemPattern: '**'
+              targetPath: '$(Pipeline.Workspace)'
+          - task: AzureFunctionApp@1
+            displayName: "Azure Function App Deploy: BritalianMart"
+            inputs:
+              azureSubscription: "$(subscription_dev)"
+              appType: functionApp
+              appName: "britalian-function-app-uat"
+              package: "$(Pipeline.Workspace)/drop/BritalianMart.zip"

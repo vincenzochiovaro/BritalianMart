@@ -23,7 +23,6 @@ namespace BritalianMart.Functions
 
         }
 
-
         [FunctionName("UpdateDescriptionProduct")]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "product/{id}")] ProductModel IncomingProduct,

@@ -30,15 +30,8 @@ The project is organized into several modules:
 - .NET SDK (version 7.0 or higher)
 - Visual Studio
 
-
-## CI/CD Pipeline
-
-A Continuous Integration and Continuous Deployment (CI/CD) pipeline is in place to streamline development and deployment:
-
-- **Environment Provisioning**: Environments (dev, test, prod) are created using Terraform on terraform.io.
-- **Branch Deployment**: Code is automatically deployed upon merging into the main branch.
-- **Testing**: Automated tests using xUnit, Fluent Assertion, Fixture, Moq, and Postman.
-- **Deployment Flow**: Dev ➡ Test ➡ Prod ensures code reliability and stability.
-
 ### API Documentation (Coming Soon)
+
+### CI/CD Pipeline (Coming Soon)
+
 ### Messaging System (Coming Soon)

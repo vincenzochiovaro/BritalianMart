@@ -13,8 +13,6 @@ namespace BritalianMart.Functions
     public class GetProduct
     {
         private readonly IProductCatalog _catalog;
-
-
         public GetProduct(IProductCatalog catalog)
         {
             _catalog = catalog;
@@ -38,7 +36,6 @@ namespace BritalianMart.Functions
                 return new BadRequestObjectResult(ex);
             }
 
-
         }
         [FunctionName("GetProductById")]
 
@@ -57,7 +54,6 @@ namespace BritalianMart.Functions
             {
                 return new BadRequestObjectResult(ex);
             }
-
 
         }
 

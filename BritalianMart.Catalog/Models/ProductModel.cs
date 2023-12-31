@@ -1,4 +1,6 @@
-﻿namespace BritalianMart.Models
+﻿using Newtonsoft.Json;
+
+namespace BritalianMart.Models
 {
     public class Entity
     {
@@ -7,14 +9,15 @@
         public DateTime Modified { get; set; }
     }
 
-
     public class ProductModel : Entity
     {
-        public string Plu { get; set; }
-        public string Description { get; set; }
+        public string? Plu { get; set; }
+        [JsonProperty("Description")]//TODO - to delete
+        public string? Description { get; set; }
+        [JsonProperty("Price")] //TODO - to delete
         public decimal Price { get; set; }
-        public string Category { get; set; }
-        public string Brand { get; set; }
+        public string? Category { get; set; }
+        public string? Brand { get; set; }
     }
 
 

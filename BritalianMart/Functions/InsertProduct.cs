@@ -45,25 +45,15 @@ namespace BritalianMart.Functions
                     product.Created = DateTime.UtcNow;
                     product.Modified = DateTime.UtcNow;
 
-                    // referencing to Andy video, we should make an extra check to prevent "duplicates"
-                    // BUTTT what if I want to insert 2 pints of milk with same plu and price and description?
-                    // if I referencethe Id (Guid) it will always be a "different" item so will be inserted regard if is a duplicated or an item to add.
-                  
-                   
-                    //Solution is: If We have a "duplicate" Item, we send back a message to the user says: Hey we have already 1 pint of milk are you sure you want to have a duplicate?
-                    
-                    
-
                     await _catalog.Add(product);
 
                     log.LogInformation($"Product Inserted into DB successfully");
+
                     return new CreatedResult(product.Id,product);
-                   
-                    
+                  
 
                 }else
                 {
-                    log.LogWarning(validatedProduct.ToString());
                     log.LogInformation("Product Not validated in InsertProductCosmos");
                     return new BadRequestObjectResult(product); 
                 }

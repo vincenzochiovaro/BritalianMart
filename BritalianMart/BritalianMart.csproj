@@ -14,6 +14,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BritalianMart.Catalog\BritalianMart.Catalog.csproj" />
+    <ProjectReference Include="..\BritalianMart.Reports\BritalianMart.Reports.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">
