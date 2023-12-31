@@ -24,8 +24,8 @@ The project is organized into several modules:
 
 - .NET SDK (version 7.0 or higher)
 - Visual Studio
-- 
-### CI/CD Pipeline (Coming Soon)
+  
+### CI/CD Pipeline
 
 A Continuous Integration and Continuous Deployment (CI/CD) pipeline has been implemented to streamline the development and deployment processes:
 
