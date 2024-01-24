@@ -1,7 +1,6 @@
 ﻿using BritalianMart.Models;
 using BritalianMart.Reports.Interfaces;
 using Microsoft.Azure.Cosmos;
-using Microsoft.Azure.Cosmos.Linq;
 
 namespace BritalianMart.Reports.Services
 {
@@ -14,23 +13,37 @@ namespace BritalianMart.Reports.Services
             _cosmosClient = cosmosClient;
         }
 
-        public async Task GetReport()
+        public async Task<List<ProductModel>> GetReport()
         {
-            var cosmosDatabase = _cosmosClient.GetDatabase("BritalianMartDB");
-            var container = cosmosDatabase.GetContainer("ProductCatalog");
-            var products = new List<ProductModel>();
-
-            var resultSet = container.GetItemLinqQueryable<ProductModel>().ToFeedIterator();
-            while (resultSet.HasMoreResults)
+            try
             {
-                var result = await resultSet.ReadNextAsync();
-                products.AddRange(result);
+                var cosmosDatabase = _cosmosClient.GetDatabase("BritalianMartDB");
+                var container = cosmosDatabase.GetContainer("ProductCatalog");
+                var query = new QueryDefinition(
+                    query: "SELECT * FROM p"
+                    );
+                var products = new List<ProductModel>();
+
+                using FeedIterator<ProductModel> feed = container.GetItemQueryIterator<ProductModel>(queryDefinition: query);
+
+                while (feed.HasMoreResults)
+                {
+                    var response = await feed.ReadNextAsync();
+                    foreach (var item in response)
+                    {
+                        products.Add(item);
+                    }
+                }
+
+                return products;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return new List<ProductModel>();
             }
 
-    // Resolve "loop" error
-    // Maybe try to create a different model and replace te ProductModel with ReportModel
         }
 
-     
     }
 }

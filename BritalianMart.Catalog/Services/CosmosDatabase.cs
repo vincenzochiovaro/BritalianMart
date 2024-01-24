@@ -57,7 +57,7 @@ namespace BritalianMart.Services
 
             var product = (await resultSet.ReadNextAsync()).FirstOrDefault();
 
-            return product;
+            return product!;
 
 
 

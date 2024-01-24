@@ -1,8 +1,10 @@
-﻿namespace BritalianMart.Reports.Interfaces
+﻿using BritalianMart.Models;
+
+namespace BritalianMart.Reports.Interfaces
 {
     public interface IProductsReport
     {
-        Task GetReport();
+        Task<List<ProductModel>> GetReport();
     }
 
 }

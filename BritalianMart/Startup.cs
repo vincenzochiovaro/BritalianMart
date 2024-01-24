@@ -1,4 +1,6 @@
-﻿using BritalianMart;
+﻿using Azure.Storage.Blobs;
+using Azure.Storage.Queues;
+using BritalianMart;
 using BritalianMart.Catalog.Interfaces;
 using BritalianMart.Models;
 using BritalianMart.Reports.Functions;
@@ -34,5 +36,13 @@ namespace BritalianMart
             builder.Services.AddScoped<AbstractValidator<ProductModel>, ProductValidator>();
             builder.Services.AddScoped<IProductCatalog, CosmosDatabase>();
             builder.Services.AddScoped<IProductsReport, CosmosDbReports>();
+
+            var blob_connection = Environment.GetEnvironmentVariable("britalianMart:BlobService:ConnectionString");
+            var queue_connection = Environment.GetEnvironmentVariable("britalianMart:QueueService:ConnectionString");
+            builder.Services.AddSingleton(new BlobServiceClient(blob_connection));
+
+            builder.Services.AddSingleton(new QueueServiceClient(queue_connection));
+
+
         }
     } }
