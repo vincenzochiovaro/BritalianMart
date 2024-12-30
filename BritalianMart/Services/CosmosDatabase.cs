@@ -18,7 +18,7 @@ namespace BritalianMart.Services
             _cosmosClient = cosmosClient;
         }
 
-        public async Task Add(ProductModel product) //how product travelled here? 
+        public async Task Add(ProductModel product)
         {
             var dbConnection = _cosmosClient.GetDatabase("BritalianMartDB");
             var dbContainer = dbConnection.GetContainer("ProductCatalog");
